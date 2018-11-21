@@ -524,6 +524,7 @@ public class FloatingViewManager implements ScreenChangedListener, View.OnTouchL
         floatingView.usePhysics(options.usePhysics);
         floatingView.setAnimateInitialMove(options.animateInitialMove);
         floatingView.setSafeInsetRect(mSafeInsetRect);
+        mTrashView.setOptions(options);
 
         // set FloatingView size
         final FrameLayout.LayoutParams targetParams = new FrameLayout.LayoutParams(options.floatingViewWidth, options.floatingViewHeight);
@@ -658,6 +659,12 @@ public class FloatingViewManager implements ScreenChangedListener, View.OnTouchL
          */
         public int floatingViewHeight;
 
+        public int trashIconWidth;
+
+        public int trashIconHeight;
+
+        public float trashActionIconScale;
+
         /**
          * FloatingViewが吸着する方向
          * ※座標を指定すると自動的にMOVE_DIRECTION_NONEになります
@@ -688,6 +695,9 @@ public class FloatingViewManager implements ScreenChangedListener, View.OnTouchL
             moveDirection = MOVE_DIRECTION_DEFAULT;
             usePhysics = true;
             animateInitialMove = true;
+            trashIconWidth = 0;
+            trashIconHeight = 0;
+            trashActionIconScale = 0;
         }
 
     }

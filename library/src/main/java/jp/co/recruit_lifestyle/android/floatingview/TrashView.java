@@ -87,6 +87,19 @@ class TrashView extends FrameLayout implements ViewTreeObserver.OnPreDrawListene
      */
     static final int ANIMATION_FORCE_CLOSE = 3;
 
+    private float trashActionIconScale = 0;
+
+    public void setOptions(FloatingViewManager.Options options) {
+        this.trashActionIconScale = options.trashActionIconScale;
+
+        if(options.trashIconWidth > 0 && options.trashIconHeight > 0){
+            final FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(options.trashIconWidth, options.trashIconHeight);
+            lp.gravity = Gravity.CENTER;
+            mActionTrashIconView.setLayoutParams(lp);
+            mFixedTrashIconView.setLayoutParams(lp);
+        }
+    }
+
     /**
      * Animation State
      */
@@ -249,6 +262,7 @@ class TrashView extends FrameLayout implements ViewTreeObserver.OnPreDrawListene
         final FrameLayout.LayoutParams fixedTrashIconParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         fixedTrashIconParams.gravity = Gravity.CENTER;
         mTrashIconRootView.addView(mFixedTrashIconView, fixedTrashIconParams);
+        mActionTrashIconView.bringToFront();
         // 削除アイコンの貼り付け
         final FrameLayout.LayoutParams trashIconParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         trashIconParams.gravity = Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM;
@@ -364,9 +378,19 @@ class TrashView extends FrameLayout implements ViewTreeObserver.OnPreDrawListene
         // 拡大率の設定
         mAnimationHandler.mTargetWidth = width;
         mAnimationHandler.mTargetHeight = height;
-        final float newWidthScale = width / mActionTrashIconBaseWidth * shape;
-        final float newHeightScale = height / mActionTrashIconBaseHeight * shape;
+
+        final float newWidthScale;
+        final float newHeightScale;
+        if(trashActionIconScale != 0){
+            newWidthScale = trashActionIconScale;
+            newHeightScale = trashActionIconScale;
+        }
+        else{
+            newWidthScale = width / mActionTrashIconBaseWidth * shape;
+            newHeightScale = height / mActionTrashIconBaseHeight * shape;
+        }
         mActionTrashIconMaxScale = Math.max(newWidthScale, newHeightScale);
+
         // ENTERアニメーション作成
         mEnterScaleAnimator = ObjectAnimator.ofPropertyValuesHolder(mActionTrashIconView, PropertyValuesHolder.ofFloat(ImageView.SCALE_X, mActionTrashIconMaxScale), PropertyValuesHolder.ofFloat(ImageView.SCALE_Y, mActionTrashIconMaxScale));
         mEnterScaleAnimator.setInterpolator(new OvershootInterpolator());
@@ -488,7 +512,6 @@ class TrashView extends FrameLayout implements ViewTreeObserver.OnPreDrawListene
 
         // アニメーションをキャンセル
         cancelScaleTrashAnimation();
-
         // 領域に入った場合
         if (isEnter) {
             mEnterScaleAnimator.start();
